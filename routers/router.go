@@ -6,11 +6,13 @@ import (
 
 // InitRoutes build Routes dynamically from AllRoutes Array
 func InitRoutes() *mux.Router {
-	router := mux.NewRouter().StrictSlash(true)
+	router := mux.NewRouter().StrictSlash(false)
 
 	router = SetRoutes(publicRoutes, router)
-	router = SetRoutes(albumsRoutes, router)
-	router = SetRoutes(artistsRoutes, router)
+
+	routerVersion := router.PathPrefix("/v1").Subrouter()
+	routerVersion = SetRoutes(albumsRoutes, routerVersion)
+	routerVersion = SetRoutes(artistsRoutes, routerVersion)
 
 	return router
 }

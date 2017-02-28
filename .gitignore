@@ -42,3 +42,5 @@ _testmain.go
 
 # Project Executable
 gogo-rest-api*
+
+.idea
