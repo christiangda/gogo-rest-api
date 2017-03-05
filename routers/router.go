@@ -2,17 +2,21 @@ package routers
 
 import (
 	"github.com/gorilla/mux"
+	"net/http"
 )
 
 // InitRoutes build Routes dynamically from AllRoutes Array
 func InitRoutes() *mux.Router {
 	router := mux.NewRouter().StrictSlash(false)
 
-	router = SetRoutes(publicRoutes, router)
+	subRouterApiVersion := router.PathPrefix("/v1").Subrouter()
 
-	routerVersion := router.PathPrefix("/v1").Subrouter()
-	routerVersion = SetRoutes(albumsRoutes, routerVersion)
-	routerVersion = SetRoutes(artistsRoutes, routerVersion)
+	// Public routes --> without token
+	subRouterApiVersion = SetRoutes(publicRoutes, router)
+
+	// Private routes --> with token
+	subRouterApiVersion = SetRoutes(albumsRoutes, subRouterApiVersion)
+	subRouterApiVersion = SetRoutes(artistsRoutes, subRouterApiVersion)
 
 	return router
 }
@@ -27,4 +31,9 @@ func SetRoutes(routes Routes, router *mux.Router) *mux.Router {
 			Name(route.Name)
 	}
 	return router
+}
+
+func SetMiddleware(middleware http.Handler, router *mux.Router) *mux.Router {
+	router.Handle("", middleware)
+
 }
